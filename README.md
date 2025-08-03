@@ -1,0 +1,2 @@
+# Android Balu media server sample
+This is a basic integration only for demostration of usage of Balu Media server, if you want to read full documentation, please check out the main repo: https://github.com/BaluMediaServer/BaluMediaServer

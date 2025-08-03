@@ -1,0 +1,74 @@
+﻿@page "/"
+@using Microsoft.Maui.ApplicationModel
+@implements IDisposable
+<h1>BaluRTSPTest Stream sample</h1>
+Started: @_started
+<div class="card">
+    @if(_connected){
+        <p>Streaming...</p>
+    }else{
+        <p>No one is connected</p>
+    }
+</div>
+@if(!String.IsNullOrEmpty(localIp)){
+    <div class="row">
+        <div class="col-6">
+            <div class="card h-100">
+                <img id="mjpegStream" class="card-img-top" src="http://127.0.0.1:8089/Back/" style="width: 100%; height: 200px;" />
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="card h-100">
+                <img id="mjpegStream" class="card-img-top" src="http://127.0.0.1:8089/Front/" style="width: 100%; height: 200px;" />
+            </div>
+        </div>
+    </div>
+}
+
+@code{
+    private Server _server;
+    private bool _connected = false, _started = false;
+    private string localIp = string.Empty;
+    protected override async Task OnInitializedAsync(){
+        await Permissions.RequestAsync<Permissions.Camera>();
+        await Permissions.RequestAsync<Permissions.Microphone>();
+        _server = new();
+        _started = _server.Start();
+        Server.OnStreaming += OnStartStreaming;
+        EventBuss.SendCommand(BaluMediaServer.Models.BussCommand.START_MJPEG_SERVER);
+        localIp = GetLocalIPAddress();
+    }
+    private void OnStartStreaming(object? sender, bool state){
+        _connected = state;
+        InvokeAsync(StateHasChanged);
+    }
+    public void Dispose(){
+        Server.OnStreaming -= OnStartStreaming;
+        EventBuss.SendCommand(BaluMediaServer.Models.BussCommand.STOP_MJPEG_SERVER);
+        _server.Stop(); // Dispose and Stop are the same
+        
+    }
+    public static string GetLocalIPAddress()
+    {
+        try
+        {
+            foreach (var networkInterface in System.Net.NetworkInformation.NetworkInterface.GetAllNetworkInterfaces())
+            {
+                if (networkInterface.OperationalStatus == System.Net.NetworkInformation.OperationalStatus.Up)
+                {
+                    foreach (var addr in networkInterface.GetIPProperties().UnicastAddresses)
+                    {
+                        if (addr.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork 
+                            && !System.Net.IPAddress.IsLoopback(addr.Address))
+                        {
+                            return addr.Address.ToString();
+                        }
+                    }
+                }
+            }
+        }
+        catch { }
+        
+        return "127.0.0.1"; // Fallback
+    }
+}
