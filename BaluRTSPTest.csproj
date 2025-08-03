@@ -51,14 +51,11 @@
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="BaluMediaServer.CameraStreamer" Version="1.0.0" />
         <PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
         <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Maui" Version="$(MauiVersion)" />
         <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.0" />
 
-    </ItemGroup>
-    <ItemGroup>
-        <!-- PROJECT REFERENCE - This is what you need -->
-        <ProjectReference Include="../BaluMediaServer/BaluMediaServer.csproj" />
     </ItemGroup>
 
 </Project>
